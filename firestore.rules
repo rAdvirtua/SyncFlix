@@ -1,0 +1,15 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /channels/{channelId} {
+      allow read: if request.auth != null;  // Allow anyone to read the channel
+      allow write: if request.auth != null && request.resource.data.createdBy == request.auth.uid;  // Only the creator can edit
+    }
+
+    match /channelMembers/{channelMemberId} {
+      allow read, write: if request.auth != null;  // Allow members to read and write their membership data
+    }
+
+    // Other rules for users and documents
+  }
+}

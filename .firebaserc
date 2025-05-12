@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "syncflix-411f4"
+  },
+  "targets": {
+    "syncflix-411f4": {
+      "hosting": {
+        "syncflixapp": [
+          "syncflix-411f4"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
