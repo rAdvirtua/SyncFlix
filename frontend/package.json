@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.6",
     "firebase": "^11.7.1",
     "lucide-react": "^0.475.0",
     "react": "^18.3.1",
@@ -20,10 +21,14 @@
   },
   "devDependencies": {
     "@getmocha/vite-plugins": "^2.0.2",
+    "@tailwindcss/postcss": "^4.1.6",
     "@types/react": "^18.3.6",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.21",
     "globals": "^15.9.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.6",
     "typescript": "^5.5.3",
     "vite": "^6.2.1"
   }
