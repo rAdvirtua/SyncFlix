@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
 import './index.css';
+import { cleanupChannelMessages } from './utils/channelUtils';
 
 // Pages
 import Home from './pages/Home';
@@ -15,13 +16,11 @@ import Channel from './pages/Channel';
 // Components
 import AuthLayout from './components/layouts/AuthLayout';
 import AppLayout from './components/layouts/AppLayout';
-import JoinChannelModal from './components/modals/JoinChannelModal';
+import JoinRedirect from './components/JoinRedirect';
 
 export function App() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showJoinModal, setShowJoinModal] = useState(false); // Track Join Channel Modal visibility
-  const [currentChannelId] = useState<string | null>(null); // Store the current channel ID for joining
 
   useEffect(() => {
     // Load fonts
@@ -34,6 +33,11 @@ export function App() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      
+      // Clean up old messages when user logs in
+      if (currentUser) {
+        cleanupChannelMessages().catch(console.error);
+      }
     });
 
     return () => unsubscribe();
@@ -59,29 +63,19 @@ export function App() {
         {/* App Routes */}
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-          
-          {/* Channel Route with dynamic ID */}
-          <Route
-            path="/channel/:channelId"
-            element={user ? <Channel /> : <Navigate to="/login" />}
-          />
+          <Route path="/channel/:channelId" element={user ? <Channel /> : <Navigate to="/login" />} />
         </Route>
 
         {/* Home and About routes */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
 
+        {/* Join Redirect */}
+        <Route path="/join" element={<JoinRedirect />} />
+        
         {/* Redirect */}
         <Route path="/home" element={<Navigate to="/" />} />
       </Routes>
-
-      {/* Show Join Channel Modal */}
-      {showJoinModal && currentChannelId && (
-        <JoinChannelModal
-          onClose={() => setShowJoinModal(false)}
-          channelId={currentChannelId}
-        />
-      )}
     </Router>
   );
 }

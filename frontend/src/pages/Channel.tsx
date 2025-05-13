@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import { doc, getDoc, collection, query, orderBy, limit, onSnapshot, addDoc, updateDoc, where } from 'firebase/firestore';
+import { useParams, useNavigate } from 'react-router-dom';
+import { doc, getDoc, collection, query, orderBy, limit, onSnapshot, addDoc, updateDoc, where, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage, auth } from '../firebase';
 import YouTube from 'react-youtube';
-import { Paperclip, Play, Send, Users, X } from 'lucide-react';
+import { Paperclip, Pause, Play, Send, Users, X } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import MemberListModal from '../components/modals/MemberListModal';
 
 interface Message {
   id: string;
@@ -18,6 +19,8 @@ interface Message {
 }
 
 const Channel = () => {
+  const navigate = useNavigate();
+  const [showMemberList, setShowMemberList] = useState(false);
   const { channelId } = useParams<{ channelId: string }>();
   const [channel, setChannel] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -277,15 +280,63 @@ const Channel = () => {
     );
   }
 
+  const handleDeleteChannel = async () => {
+    if (!channelId || !user || !isAdmin) return;
+    
+    try {
+      // Delete channel document
+      await deleteDoc(doc(db, 'channels', channelId));
+      
+      // Delete all channel members
+      const membersQuery = query(
+        collection(db, 'channelMembers'),
+        where('channelId', '==', channelId)
+      );
+      
+      const memberDocs = await getDocs(membersQuery);
+      const deletePromises = memberDocs.docs.map(doc => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+      
+      // Delete channel video state
+      await deleteDoc(doc(db, 'channelVideoState', channelId));
+      
+      // Delete channel messages
+      const messagesQuery = query(
+        collection(db, 'channelMessages'),
+        where('channelId', '==', channelId)
+      );
+      
+      const messageDocs = await getDocs(messagesQuery);
+      const deleteMessagePromises = messageDocs.docs.map(doc => deleteDoc(doc.ref));
+      await Promise.all(deleteMessagePromises);
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      console.error("Error deleting channel:", err);
+      setError('Failed to delete channel');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Channel header */}
       <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-4 border-b border-slate-700 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold">#{channel.name}</h1>
-          <p className="text-slate-400 text-sm">{channel.description || "No description"}</p>
+          <div className="flex items-center text-slate-400 text-sm">
+            <span>{channel.description || "No description"}</span>
+            {channel.joinCode && (
+              <span className="ml-2 bg-slate-600 px-2 py-0.5 rounded text-xs">
+                Code: {channel.joinCode}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="flex items-center text-slate-400">
+        <div 
+          className="flex items-center text-slate-400 cursor-pointer hover:text-white"
+          onClick={() => setShowMemberList(true)}
+        >
           <Users size={16} className="mr-1" />
           <span>{channel.memberCount} members</span>
         </div>
@@ -356,7 +407,7 @@ const Channel = () => {
         {/* Chat section */}
         <div className="w-full md:w-1/3 flex flex-col border-t md:border-t-0 md:border-l border-slate-700">
           {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto bg-slate-850">
+          <div className="flex-1 p-4 overflow-y-auto bg-slate-800">
             {messages.length === 0 ? (
               <div className="text-center text-slate-500 py-4">
                 No messages yet. Be the first to say something!
@@ -465,6 +516,16 @@ const Channel = () => {
           </div>
         </div>
       </div>
+
+      {/* Member List Modal */}
+      {showMemberList && (
+        <MemberListModal 
+          channelId={channelId} 
+          isAdmin={isAdmin} 
+          onClose={() => setShowMemberList(false)} 
+          onDeleteChannel={handleDeleteChannel}
+        />
+      )}
     </div>
   );
 };

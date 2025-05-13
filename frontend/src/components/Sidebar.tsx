@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { LogOut, Plus, Users } from 'lucide-react';
+import { Link as LinkIcon, LogOut, Plus, Users } from 'lucide-react';
 import CreateChannelModal from './modals/CreateChannelModal';
 import JoinChannelModal from './modals/JoinChannelModal';
 
@@ -15,20 +15,32 @@ const Sidebar = ({ closeMobileSidebar }: SidebarProps) => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);  // Track selected channel ID
+  const [showInviteTooltip, setShowInviteTooltip] = useState(false);
+  const [currentChannelId, setCurrentChannelId] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const user = auth.currentUser;
+
+  // Get current channel ID from location
+  useEffect(() => {
+    const match = location.pathname.match(/\/channel\/([^/]+)/);
+    if (match && match[1]) {
+      setCurrentChannelId(match[1]);
+    } else {
+      setCurrentChannelId(null);
+    }
+  }, [location]);
 
   useEffect(() => {
     const fetchChannels = async () => {
       if (!user) return;
 
       try {
-        // Fetch channels where the user is a member
+        // Fetch channels where the user is a member (limit to 100)
         const membershipQuery = query(
           collection(db, 'channelMembers'),
-          where('userId', '==', user.uid)
+          where('userId', '==', user.uid),
+          limit(100)
         );
         
         const membershipDocs = await getDocs(membershipQuery);
@@ -41,18 +53,35 @@ const Sidebar = ({ closeMobileSidebar }: SidebarProps) => {
         }
 
         // Fetch the actual channel documents
-        const channelsQuery = query(
-          collection(db, 'channels'),
-          where('id', 'in', channelIds)
-        );
+        // Note: Firestore "in" queries are limited to 10 items per query
+        // For larger sets, we need to batch the requests
+        let allChannelData: any[] = [];
         
-        const channelDocs = await getDocs(channelsQuery);
-        const channelData = channelDocs.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        // Process in batches of 10
+        for (let i = 0; i < channelIds.length; i += 10) {
+          const batch = channelIds.slice(i, i + 10);
+          if (batch.length > 0) {
+            const channelsQuery = query(
+              collection(db, 'channels'),
+              where('id', 'in', batch)
+            );
+            
+            const channelDocs = await getDocs(channelsQuery);
+            const batchData = channelDocs.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            
+            allChannelData = [...allChannelData, ...batchData];
+          }
+        }
         
-        setChannels(channelData);
+        // Sort channels by most recently joined/created first
+        allChannelData.sort((a, b) => {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        
+        setChannels(allChannelData);
       } catch (error) {
         console.error("Error fetching channels:", error);
       } finally {
@@ -68,17 +97,28 @@ const Sidebar = ({ closeMobileSidebar }: SidebarProps) => {
     if (closeMobileSidebar) closeMobileSidebar();
   };
 
-  const handleJoinModal = (channelId: string) => {
-    setSelectedChannelId(channelId);  // Set the selected channel ID
-    setShowJoinModal(true);  // Open the Join Modal
-  };
-
   const handleSignOut = async () => {
     try {
       await auth.signOut();
       navigate('/login');
     } catch (error) {
       console.error("Error signing out:", error);
+    }
+  };
+
+  const copyInviteLink = () => {
+    if (!currentChannelId) return;
+    
+    // Find current channel in list
+    const currentChannel = channels.find(c => c.id === currentChannelId);
+    if (currentChannel && currentChannel.joinCode) {
+      // Create invite link with code
+      const inviteLink = `${window.location.origin}/join?code=${currentChannel.joinCode}`;
+      navigator.clipboard.writeText(inviteLink);
+      
+      // Show tooltip
+      setShowInviteTooltip(true);
+      setTimeout(() => setShowInviteTooltip(false), 2000);
     }
   };
 
@@ -102,10 +142,30 @@ const Sidebar = ({ closeMobileSidebar }: SidebarProps) => {
             <span>Dashboard</span>
           </div>
 
+          {/* Invite Link Button (only show when in a channel) */}
+          {currentChannelId && (
+            <div className="px-4 mb-4 relative">
+              <button
+                onClick={copyInviteLink}
+                className="w-full flex items-center justify-center space-x-2 bg-slate-700 hover:bg-slate-600 text-white rounded py-2 px-4"
+              >
+                <LinkIcon size={16} />
+                <span>Copy Invite Link</span>
+              </button>
+              
+              {showInviteTooltip && (
+                <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-8 bg-slate-900 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                  Invite link copied!
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Channels section */}
-          <div className="mt-6">
-            <div className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase">
-              My Channels
+          <div className="mt-2">
+            <div className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase flex items-center justify-between">
+              <span>My Channels</span>
+              <span className="text-slate-400">{channels.length}/100</span>
             </div>
             
             {loading ? (
@@ -113,7 +173,7 @@ const Sidebar = ({ closeMobileSidebar }: SidebarProps) => {
             ) : channels.length === 0 ? (
               <div className="px-4 py-2 text-slate-400">No channels yet</div>
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-1 max-h-80 overflow-y-auto pr-2">
                 {channels.map((channel) => (
                   <div
                     key={channel.id}
@@ -124,17 +184,14 @@ const Sidebar = ({ closeMobileSidebar }: SidebarProps) => {
                     }`}
                     onClick={() => handleChannelClick(channel.id)}
                   >
-                    # {channel.name}
-                    {/* Button to open the Join Channel modal */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();  // Prevent the channel click event
-                        handleJoinModal(channel.id);
-                      }}
-                      className="ml-2 text-sm text-blue-500 hover:text-blue-400"
-                    >
-                      Join
-                    </button>
+                    <div className="flex items-center">
+                      <span className="truncate"># {channel.name}</span>
+                    </div>
+                    {location.pathname === `/channel/${channel.id}` && channel.joinCode && (
+                      <div className="text-xs text-slate-400 mt-1">
+                        Code: {channel.joinCode}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -178,11 +235,8 @@ const Sidebar = ({ closeMobileSidebar }: SidebarProps) => {
         <CreateChannelModal onClose={() => setShowCreateModal(false)} />
       )}
       
-      {showJoinModal && selectedChannelId && (
-        <JoinChannelModal
-          onClose={() => setShowJoinModal(false)}
-          channelId={selectedChannelId}  // Pass the selected channel ID here
-        />
+      {showJoinModal && (
+        <JoinChannelModal onClose={() => setShowJoinModal(false)} />
       )}
     </>
   );

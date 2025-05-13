@@ -84,7 +84,7 @@ const Home = () => {
                 J
               </div>
               <div className="ml-4 text-left">
-                <p className="font-semibold text-white">Jamie S.</p>
+                <p className="font-semibold text-white">Asmita C.</p>
                 <p className="text-slate-400 text-sm">Music enthusiast</p>
               </div>
             </div>
