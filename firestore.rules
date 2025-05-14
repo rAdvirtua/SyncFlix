@@ -1,15 +1,18 @@
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Rules for channels
     match /channels/{channelId} {
-      allow read: if request.auth != null;  // Allow anyone to read the channel
-      allow write: if request.auth != null && request.resource.data.createdBy == request.auth.uid;  // Only the creator can edit
+      allow read: if request.auth != null;  // Allow authenticated users to read channels
+      allow write: if request.auth != null && request.auth.uid == resource.data.creatorId;  // Only the creator can edit
     }
 
+    // Rules for channel members
     match /channelMembers/{channelMemberId} {
-      allow read, write: if request.auth != null;  // Allow members to read and write their membership data
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;  // Only the member can read their membership
+      allow write: if request.auth != null && request.auth.uid == resource.data.userId;  // Only the member can write their membership
     }
 
-    // Other rules for users and documents
+    // Add other rules as needed for additional collections
   }
 }

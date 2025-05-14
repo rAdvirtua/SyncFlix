@@ -17,13 +17,13 @@ const Home = () => {
           <div className="flex justify-center space-x-4">
             <Link 
               to="/register" 
-              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium rounded-lg hover:from-orange-600 hover:to-orange-700 hover:scale-105 transition-transform duration-300 shadow-lg"
             >
               Get Started
             </Link>
             <Link 
               to="/login" 
-              className="px-6 py-3 bg-slate-700 text-white font-medium rounded-lg hover:bg-slate-600 transition-all"
+              className="px-6 py-3 bg-slate-700 text-white font-medium rounded-lg hover:bg-slate-600 hover:scale-105 transition-transform duration-300"
             >
               Sign In
             </Link>
@@ -37,7 +37,7 @@ const Home = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-white">How SyncFlix Works</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg hover:scale-105 transition-transform duration-300">
               <div className="bg-orange-500 rounded-full w-12 h-12 flex items-center justify-center mb-4">
                 <Music size={24} className="text-white" />
               </div>
@@ -47,7 +47,7 @@ const Home = () => {
               </p>
             </div>
             
-            <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg hover:scale-105 transition-transform duration-300">
               <div className="bg-orange-500 rounded-full w-12 h-12 flex items-center justify-center mb-4">
                 <Play size={24} className="text-white" />
               </div>
@@ -57,7 +57,7 @@ const Home = () => {
               </p>
             </div>
             
-            <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg hover:scale-105 transition-transform duration-300">
               <div className="bg-orange-500 rounded-full w-12 h-12 flex items-center justify-center mb-4">
                 <MessageSquare size={24} className="text-white" />
               </div>
@@ -75,7 +75,7 @@ const Home = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-12 text-white">What Friends Are Saying</h2>
           
-          <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-8 rounded-xl shadow-lg">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-8 rounded-xl shadow-lg hover:scale-105 transition-transform duration-300">
             <p className="text-xl italic text-slate-300 mb-6">
               "Since my best friend moved to a different school, we use SyncFlix every weekend to watch our favorite bands together. It's like she never left!"
             </p>
@@ -101,7 +101,7 @@ const Home = () => {
           </p>
           <Link 
             to="/register" 
-            className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg text-lg"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-lg hover:from-orange-600 hover:to-orange-700 hover:scale-110 hover:shadow-xl transition-transform duration-300 shadow-lg text-lg"
           >
             Get Started Now
           </Link>

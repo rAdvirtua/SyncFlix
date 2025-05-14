@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, collection, query, orderBy, limit, onSnapshot, addDoc, updateDoc, where, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, orderBy, limit, onSnapshot, addDoc, updateDoc, where, deleteDoc, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage, auth } from '../firebase';
 import YouTube from 'react-youtube';
@@ -518,7 +518,7 @@ const Channel = () => {
       </div>
 
       {/* Member List Modal */}
-      {showMemberList && (
+      {showMemberList && channelId && (
         <MemberListModal 
           channelId={channelId} 
           isAdmin={isAdmin} 

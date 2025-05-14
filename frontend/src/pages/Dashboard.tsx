@@ -90,7 +90,7 @@ const Dashboard = () => {
             {recentChannels.map(channel => (
               <div 
                 key={channel.id}
-                className="bg-slate-800 rounded-lg p-5 cursor-pointer hover:bg-slate-750 transition-colors"
+                className="bg-slate-800 rounded-lg p-5 cursor-pointer hover:scale-101 hover:bg-slate-750 transition-transform"
                 onClick={() => navigate(`/channel/${channel.id}`)}
               >
                 <h3 className="font-semibold text-lg mb-2 text-orange-500">

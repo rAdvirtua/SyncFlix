@@ -2,10 +2,14 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-orange-500">About SyncFlix</h1>
+        <h1 className="text-4xl font-bold mb-8 text-orange-500">
+          About SyncFlix
+        </h1>
         
-        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg mb-8">
-          <h2 className="text-2xl font-semibold mb-4 text-white">Our Story</h2>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg mb-8 hover:scale-105 hover:shadow-2xl transition-transform duration-300">
+          <h2 className="text-2xl font-semibold mb-4 text-white">
+            Our Story
+          </h2>
           <p className="text-slate-300 mb-4">
             SyncFlix was born from a simple problem: staying connected with friends when life takes us in different directions. 
             As classmates found themselves in different classes and schools, we missed the experience of listening to music together 
@@ -18,8 +22,10 @@ const About = () => {
           </p>
         </div>
         
-        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg mb-8">
-          <h2 className="text-2xl font-semibold mb-4 text-white">Our Mission</h2>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg mb-8 hover:scale-105 hover:shadow-2xl transition-transform duration-300">
+          <h2 className="text-2xl font-semibold mb-4 text-white">
+            Our Mission
+          </h2>
           <p className="text-slate-300">
             We believe that music and videos are meant to be shared experiences. Our mission is to recreate the magic of 
             sitting in the same room with your friends, reacting to the same beats, laughing at the same moments, 
@@ -27,8 +33,10 @@ const About = () => {
           </p>
         </div>
         
-        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4 text-white">Connect With Us</h2>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg hover:scale-105 hover:shadow-2xl transition-transform duration-300">
+          <h2 className="text-2xl font-semibold mb-4 text-white">
+            Connect With Us
+          </h2>
           <p className="text-slate-300 mb-4">
             We're always looking for ways to improve and would love to hear your feedback or feature requests.
             Feel free to reach out through our social media channels or email us directly.
