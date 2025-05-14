@@ -51,6 +51,7 @@ const Register = () => {
       <div className="text-slate-400 mb-8">Join the ultimate watch party crew! 🎵🎬</div>
       
       <form onSubmit={handleRegister} className="w-full space-y-4">
+        {/* Name Input */}
         <div className="space-y-1">
           <label className="block text-slate-300 text-sm font-medium">Name</label>
           <div className="relative">
@@ -61,13 +62,14 @@ const Register = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="bg-slate-800 block w-full pl-10 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="bg-slate-800 block w-full pl-10 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-orange-100 focus:text-black placeholder-white text-white transition-colors"
               placeholder="Your Name"
               required
             />
           </div>
         </div>
 
+        {/* Email Input */}
         <div className="space-y-1">
           <label className="block text-slate-300 text-sm font-medium">Email</label>
           <div className="relative">
@@ -78,13 +80,14 @@ const Register = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-slate-800 block w-full pl-10 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="bg-slate-800 block w-full pl-10 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-orange-100 focus:text-black placeholder-white text-white transition-colors"
               placeholder="your.email@example.com"
               required
             />
           </div>
         </div>
 
+        {/* Password Input */}
         <div className="space-y-1">
           <label className="block text-slate-300 text-sm font-medium">Password</label>
           <div className="relative">
@@ -95,7 +98,7 @@ const Register = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-slate-800 block w-full pl-10 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="bg-slate-800 block w-full pl-10 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-orange-100 focus:text-black placeholder-white text-white transition-colors"
               placeholder="••••••••"
               minLength={6}
               required
@@ -103,11 +106,21 @@ const Register = () => {
           </div>
         </div>
 
-        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {/* Error Message */}
+        {error && (
+          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-lg animate-pulse">
+            {error === "Firebase: Error (auth/email-already-in-use)." ? (
+              "Account already registered!"
+            ) : (
+              error
+            )}
+          </div>
+        )}
 
+        {/* Register Button */}
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium py-2 px-4 rounded-lg hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium py-2 px-4 rounded-lg hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 disabled:opacity-50 cursor-pointer hover:scale-105 transition-transform"
           disabled={loading}
         >
           {loading ? 'Creating account...' : 'Register'}
